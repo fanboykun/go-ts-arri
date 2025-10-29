@@ -1,8 +1,8 @@
 import Image, { type ImageProps } from "next/image";
-import { Button } from "@repo/ui/button";
 import styles from "./page.module.css";
-import { client } from "../lib/rpc/client";
-import { Suspense, use } from "react";
+import { GoodByeAlert } from "./GoodByeAlert";
+import { TestRpc } from "./TestRpc";
+import { Suspense } from "react";
 
 type Props = Omit<ImageProps, "src"> & {
   srcLight: string;
@@ -65,10 +65,10 @@ export default function Home() {
             Read our docs
           </a>
         </div>
-        <Button appName="web" className={styles.secondary}>
-          Open alert
-        </Button>
-        <TestRpc />
+        <GoodByeAlert />
+        <Suspense>
+          <TestRpc />
+        </Suspense>
       </main>
       <footer className={styles.footer}>
         <a
@@ -102,10 +102,4 @@ export default function Home() {
       </footer>
     </div>
   );
-}
-
-function TestRpc() {
-  const response = client.sayHello({ name: "Skibidi" });
-  const result = use(response);
-  return <div>{JSON.stringify(result, null, 2)}</div>;
 }

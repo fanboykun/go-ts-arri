@@ -1,5 +1,18 @@
 # Turborepo starter
 
+## Requirement:
+
+- bun
+- go
+
+## Instalation:
+
+```bash
+git clone https://github.com/fanboykun/go-ts-arri
+cd go-ts-arri
+bun install
+```
+
 ## Run The App:
 
 - Client

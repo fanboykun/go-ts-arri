@@ -52,38 +52,86 @@ export class RpcClient {
     this._onError = config.onError;
     this._options = config.options;
   }
+  /**
+   * Katakan hello dari namanu
+   */
   async sayHello(
     params: GreetingParams,
     options?: ArriRequestOptions,
   ): Promise<GreetingResponse> {
     return arriRequest<GreetingResponse, GreetingParams>({
       url: `${this._baseUrl}/say-hello`,
-      method: "post",
+      method: "get",
       ofetch: this._fetch,
       headers: this._headers,
       onError: this._onError,
       params: params,
       responseFromJson: $$GreetingResponse.fromJson,
       responseFromString: $$GreetingResponse.fromJsonString,
-      serializer: $$GreetingParams.toJsonString,
+      serializer: $$GreetingParams.toUrlQueryString,
       clientVersion: "",
       options: options ?? this._options,
     });
   }
+  /**
+   * Katakan Goodbye
+   */
   async sayGoodbye(
     params: GreetingParams,
     options?: ArriRequestOptions,
   ): Promise<GreetingResponse> {
     return arriRequest<GreetingResponse, GreetingParams>({
       url: `${this._baseUrl}/say-goodbye`,
-      method: "post",
+      method: "get",
       ofetch: this._fetch,
       headers: this._headers,
       onError: this._onError,
       params: params,
       responseFromJson: $$GreetingResponse.fromJson,
       responseFromString: $$GreetingResponse.fromJsonString,
-      serializer: $$GreetingParams.toJsonString,
+      serializer: $$GreetingParams.toUrlQueryString,
+      clientVersion: "",
+      options: options ?? this._options,
+    });
+  }
+  /**
+   * Ambil Alamat Mu
+   */
+  async getAddress(
+    params: OptionalParams,
+    options?: ArriRequestOptions,
+  ): Promise<GreetingResponse> {
+    return arriRequest<GreetingResponse, OptionalParams>({
+      url: `${this._baseUrl}/get-address`,
+      method: "get",
+      ofetch: this._fetch,
+      headers: this._headers,
+      onError: this._onError,
+      params: params,
+      responseFromJson: $$GreetingResponse.fromJson,
+      responseFromString: $$GreetingResponse.fromJsonString,
+      serializer: $$OptionalParams.toUrlQueryString,
+      clientVersion: "",
+      options: options ?? this._options,
+    });
+  }
+  /**
+   * Paginate Users Data
+   */
+  async getUsers(
+    params: PaginationParams,
+    options?: ArriRequestOptions,
+  ): Promise<PaginationResponse> {
+    return arriRequest<PaginationResponse, PaginationParams>({
+      url: `${this._baseUrl}/get-users`,
+      method: "get",
+      ofetch: this._fetch,
+      headers: this._headers,
+      onError: this._onError,
+      params: params,
+      responseFromJson: $$PaginationResponse.fromJson,
+      responseFromString: $$PaginationResponse.fromJsonString,
+      serializer: $$PaginationParams.toUrlQueryString,
       clientVersion: "",
       options: options ?? this._options,
     });
@@ -92,15 +140,24 @@ export class RpcClient {
 
 export interface GreetingParams {
   name: string;
+  age: number;
 }
 export const $$GreetingParams: ArriModelValidator<GreetingParams> = {
   new(): GreetingParams {
     return {
       name: "",
+      age: 0,
     };
   },
   validate(input): input is GreetingParams {
-    return isObject(input) && typeof input.name === "string";
+    return (
+      isObject(input) &&
+      typeof input.name === "string" &&
+      typeof input.age === "number" &&
+      Number.isInteger(input.age) &&
+      input.age >= 0 &&
+      input.age <= UINT16_MAX
+    );
   },
   fromJson(input): GreetingParams {
     let _name: string;
@@ -109,8 +166,20 @@ export const $$GreetingParams: ArriModelValidator<GreetingParams> = {
     } else {
       _name = "";
     }
+    let _age: number;
+    if (
+      typeof input.age === "number" &&
+      Number.isInteger(input.age) &&
+      input.age >= 0 &&
+      input.age <= UINT16_MAX
+    ) {
+      _age = input.age;
+    } else {
+      _age = 0;
+    }
     return {
       name: _name,
+      age: _age,
     };
   },
   fromJsonString(input): GreetingParams {
@@ -120,12 +189,15 @@ export const $$GreetingParams: ArriModelValidator<GreetingParams> = {
     let json = "{";
     json += '"name":';
     json += serializeString(input.name);
+    json += ',"age":';
+    json += `${input.age}`;
     json += "}";
     return json;
   },
   toUrlQueryString(input): string {
     const queryParts: string[] = [];
     queryParts.push(`name=${input.name}`);
+    queryParts.push(`age=${input.age}`);
     return queryParts.join("&");
   },
 };
@@ -166,6 +238,276 @@ export const $$GreetingResponse: ArriModelValidator<GreetingResponse> = {
   toUrlQueryString(input): string {
     const queryParts: string[] = [];
     queryParts.push(`message=${input.message}`);
+    return queryParts.join("&");
+  },
+};
+
+export interface OptionalParams {
+  address: string | null;
+}
+export const $$OptionalParams: ArriModelValidator<OptionalParams> = {
+  new(): OptionalParams {
+    return {
+      address: null,
+    };
+  },
+  validate(input): input is OptionalParams {
+    return (
+      isObject(input) &&
+      (typeof input.address === "string" || input.address === null)
+    );
+  },
+  fromJson(input): OptionalParams {
+    let _address: string | null;
+    if (typeof input.address === "string") {
+      _address = input.address;
+    } else {
+      _address = null;
+    }
+    return {
+      address: _address,
+    };
+  },
+  fromJsonString(input): OptionalParams {
+    return $$OptionalParams.fromJson(JSON.parse(input));
+  },
+  toJsonString(input): string {
+    let json = "{";
+    json += '"address":';
+    if (typeof input.address === "string") {
+      json += serializeString(input.address);
+    } else {
+      json += "null";
+    }
+    json += "}";
+    return json;
+  },
+  toUrlQueryString(input): string {
+    const queryParts: string[] = [];
+    queryParts.push(`address=${input.address}`);
+    return queryParts.join("&");
+  },
+};
+
+export interface PaginationParams {
+  page: number;
+  limit: number;
+  offset: number;
+}
+export const $$PaginationParams: ArriModelValidator<PaginationParams> = {
+  new(): PaginationParams {
+    return {
+      page: 0,
+      limit: 0,
+      offset: 0,
+    };
+  },
+  validate(input): input is PaginationParams {
+    return (
+      isObject(input) &&
+      typeof input.page === "number" &&
+      Number.isInteger(input.page) &&
+      input.page >= 0 &&
+      input.page <= UINT16_MAX &&
+      typeof input.limit === "number" &&
+      Number.isInteger(input.limit) &&
+      input.limit >= 0 &&
+      input.limit <= UINT16_MAX &&
+      typeof input.offset === "number" &&
+      Number.isInteger(input.offset) &&
+      input.offset >= 0 &&
+      input.offset <= UINT16_MAX
+    );
+  },
+  fromJson(input): PaginationParams {
+    let _page: number;
+    if (
+      typeof input.page === "number" &&
+      Number.isInteger(input.page) &&
+      input.page >= 0 &&
+      input.page <= UINT16_MAX
+    ) {
+      _page = input.page;
+    } else {
+      _page = 0;
+    }
+    let _limit: number;
+    if (
+      typeof input.limit === "number" &&
+      Number.isInteger(input.limit) &&
+      input.limit >= 0 &&
+      input.limit <= UINT16_MAX
+    ) {
+      _limit = input.limit;
+    } else {
+      _limit = 0;
+    }
+    let _offset: number;
+    if (
+      typeof input.offset === "number" &&
+      Number.isInteger(input.offset) &&
+      input.offset >= 0 &&
+      input.offset <= UINT16_MAX
+    ) {
+      _offset = input.offset;
+    } else {
+      _offset = 0;
+    }
+    return {
+      page: _page,
+      limit: _limit,
+      offset: _offset,
+    };
+  },
+  fromJsonString(input): PaginationParams {
+    return $$PaginationParams.fromJson(JSON.parse(input));
+  },
+  toJsonString(input): string {
+    let json = "{";
+    json += '"page":';
+    json += `${input.page}`;
+    json += ',"limit":';
+    json += `${input.limit}`;
+    json += ',"offset":';
+    json += `${input.offset}`;
+    json += "}";
+    return json;
+  },
+  toUrlQueryString(input): string {
+    const queryParts: string[] = [];
+    queryParts.push(`page=${input.page}`);
+    queryParts.push(`limit=${input.limit}`);
+    queryParts.push(`offset=${input.offset}`);
+    return queryParts.join("&");
+  },
+};
+
+export interface PaginationResponse {
+  data: User[] | null;
+}
+export const $$PaginationResponse: ArriModelValidator<PaginationResponse> = {
+  new(): PaginationResponse {
+    return {
+      data: null,
+    };
+  },
+  validate(input): input is PaginationResponse {
+    return (
+      isObject(input) &&
+      ((Array.isArray(input.data) &&
+        input.data.every((_element) => $$User.validate(_element))) ||
+        input.data === null)
+    );
+  },
+  fromJson(input): PaginationResponse {
+    let _data: User[] | null;
+    if (Array.isArray(input.data)) {
+      _data = [];
+      for (const _dataEl of input.data) {
+        let _dataElValue: User;
+        if (isObject(_dataEl)) {
+          _dataElValue = $$User.fromJson(_dataEl);
+        } else {
+          _dataElValue = $$User.new();
+        }
+        _data.push(_dataElValue);
+      }
+    } else {
+      _data = null;
+    }
+    return {
+      data: _data,
+    };
+  },
+  fromJsonString(input): PaginationResponse {
+    return $$PaginationResponse.fromJson(JSON.parse(input));
+  },
+  toJsonString(input): string {
+    let json = "{";
+    json += '"data":';
+    if (input.data !== null) {
+      json += "[";
+      for (let i = 0; i < input.data.length; i++) {
+        if (i !== 0) json += ",";
+        const _inputDataEl = input.data[i];
+        json += $$User.toJsonString(_inputDataEl);
+      }
+      json += "]";
+    } else {
+      json += "null";
+    }
+    json += "}";
+    return json;
+  },
+  toUrlQueryString(input): string {
+    const queryParts: string[] = [];
+    console.warn(
+      "[WARNING] Cannot serialize arrays to query string. Skipping property at /PaginationResponse/data.",
+    );
+    return queryParts.join("&");
+  },
+};
+
+export interface User {
+  name: string;
+  age: number;
+}
+export const $$User: ArriModelValidator<User> = {
+  new(): User {
+    return {
+      name: "",
+      age: 0,
+    };
+  },
+  validate(input): input is User {
+    return (
+      isObject(input) &&
+      typeof input.name === "string" &&
+      typeof input.age === "number" &&
+      Number.isInteger(input.age) &&
+      input.age >= 0 &&
+      input.age <= UINT16_MAX
+    );
+  },
+  fromJson(input): User {
+    let _name: string;
+    if (typeof input.name === "string") {
+      _name = input.name;
+    } else {
+      _name = "";
+    }
+    let _age: number;
+    if (
+      typeof input.age === "number" &&
+      Number.isInteger(input.age) &&
+      input.age >= 0 &&
+      input.age <= UINT16_MAX
+    ) {
+      _age = input.age;
+    } else {
+      _age = 0;
+    }
+    return {
+      name: _name,
+      age: _age,
+    };
+  },
+  fromJsonString(input): User {
+    return $$User.fromJson(JSON.parse(input));
+  },
+  toJsonString(input): string {
+    let json = "{";
+    json += '"name":';
+    json += serializeString(input.name);
+    json += ',"age":';
+    json += `${input.age}`;
+    json += "}";
+    return json;
+  },
+  toUrlQueryString(input): string {
+    const queryParts: string[] = [];
+    queryParts.push(`name=${input.name}`);
+    queryParts.push(`age=${input.age}`);
     return queryParts.join("&");
   },
 };

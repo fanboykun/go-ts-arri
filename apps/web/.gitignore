@@ -34,4 +34,4 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-rpc-client-gen.ts
+*.gen.ts
