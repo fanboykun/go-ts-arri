@@ -1,5 +1,20 @@
 # Turborepo starter
 
+## Run The App:
+
+- Client
+
+```bash
+bun run dev
+```
+
+- Server
+
+```Bash
+cd apps/server
+go run .
+```
+
 This Turborepo starter is maintained by the Turborepo core team.
 
 ## Using this example
