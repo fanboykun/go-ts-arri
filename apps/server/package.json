@@ -1,0 +1,9 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "An RPC server created with Arri RPC",
+  "scripts": { "dev": "arri dev", "build": "arri build" },
+  "keywords": [],
+  "devDependencies": { "arri": "0.80.3" },
+  "private": true
+}
