@@ -1,8 +1,5 @@
 import Image, { type ImageProps } from "next/image";
 import styles from "./page.module.css";
-import { GoodByeAlert } from "./GoodByeAlert";
-import { TestRpc } from "./TestRpc";
-import { Suspense } from "react";
 
 type Props = Omit<ImageProps, "src"> & {
   srcLight: string;
@@ -65,10 +62,6 @@ export default function Home() {
             Read our docs
           </a>
         </div>
-        <GoodByeAlert />
-        <Suspense>
-          <TestRpc />
-        </Suspense>
       </main>
       <footer className={styles.footer}>
         <a

@@ -19,11 +19,7 @@ const defaultParams: RpcClientProps = {
         method: cloned.method,
         headers: cloned.headers,
       });
-      event.request = new Request(newRequest, {
-        headers: {
-          Authorization: "Bearer 123",
-        },
-      });
+      event.request = newRequest;
     },
   },
 };
